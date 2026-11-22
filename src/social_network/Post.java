@@ -12,6 +12,6 @@ public class Post {
     protected Date updatedAt;
     
     
-        
+    
     
 }

@@ -245,64 +245,76 @@ FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 
 -- Triggers that replace the CHECK constraints (see note at the top)
 DELIMITER $$
+
 CREATE TRIGGER trg_friendships_bi BEFORE INSERT ON friendships FOR EACH ROW
 BEGIN
   IF NEW.user_a >= NEW.user_b THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'user_a must be less than user_b';
   END IF;
 END$$
+
 CREATE TRIGGER trg_friendships_bu BEFORE UPDATE ON friendships FOR EACH ROW
 BEGIN
   IF NEW.user_a >= NEW.user_b THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'user_a must be less than user_b';
   END IF;
 END$$
+
 CREATE TRIGGER trg_follows_bi BEFORE INSERT ON follows FOR EACH ROW
 BEGIN
   IF NEW.follower_id = NEW.following_id THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'a user cannot follow themselves';
   END IF;
 END$$
+
 CREATE TRIGGER trg_follows_bu BEFORE UPDATE ON follows FOR EACH ROW
 BEGIN
   IF NEW.follower_id = NEW.following_id THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'a user cannot follow themselves';
   END IF;
 END$$
+
 CREATE TRIGGER trg_blocked_users_bi BEFORE INSERT ON blocked_users FOR EACH ROW
 BEGIN
   IF NEW.blocker_id = NEW.blocked_id THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'a user cannot block themselves';
   END IF;
 END$$
+
 CREATE TRIGGER trg_blocked_users_bu BEFORE UPDATE ON blocked_users FOR EACH ROW
 BEGIN
   IF NEW.blocker_id = NEW.blocked_id THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'a user cannot block themselves';
   END IF;
 END$$
+
 CREATE TRIGGER trg_friend_requests_bi BEFORE INSERT ON friend_requests FOR EACH ROW
 BEGIN
   IF NEW.from_id = NEW.to_id THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'a user cannot send a request to themselves';
   END IF;
 END$$
+
 CREATE TRIGGER trg_friend_requests_bu BEFORE UPDATE ON friend_requests FOR EACH ROW
 BEGIN
   IF NEW.from_id = NEW.to_id THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'a user cannot send a request to themselves';
   END IF;
 END$$
+
 CREATE TRIGGER trg_reports_bi BEFORE INSERT ON reports FOR EACH ROW
 BEGIN
   IF (NEW.post_id IS NULL) = (NEW.reported_user_id IS NULL) THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'a report must target exactly one post or one user';
   END IF;
 END$$
+
 CREATE TRIGGER trg_reports_bu BEFORE UPDATE ON reports FOR EACH ROW
 BEGIN
   IF (NEW.post_id IS NULL) = (NEW.reported_user_id IS NULL) THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'a report must target exactly one post or one user';
   END IF;
 END$$
+
 DELIMITER ;
+ 
