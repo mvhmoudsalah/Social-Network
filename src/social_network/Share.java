@@ -1,13 +1,28 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package social_network;
 
-/**
- *
- * @author mmvhm
- */
+import java.util.Date;
+
 public class Share {
-    
+    private int id;
+    private final int userId;
+    private final int postId;
+    private final Date createdAt;
+
+    public Share(int id, int userId, int postId, Date createdAt) {
+        this.id = id;
+        this.userId = userId;
+        this.postId = postId;
+        this.createdAt = createdAt;
+    }
+
+    public int getId() { return id; }
+
+    /** Used after an insert, when the database gives the new id. */
+    void setId(int id) { this.id = id; }
+
+    public int getUserId() { return userId; }
+
+    public int getPostId() { return postId; }
+
+    public Date getCreatedAt() { return createdAt; }
 }
