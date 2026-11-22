@@ -1,13 +1,21 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package social_network;
 
-/**
- *
- * @author mmvhm
- */
+import java.util.Date;
+
 public class SavedPost {
-    
+    private final int userId;
+    private final int postId;
+    private final Date savedAt;
+
+    public SavedPost(int userId, int postId, Date savedAt) {
+        this.userId = userId;
+        this.postId = postId;
+        this.savedAt = savedAt;
+    }
+
+    public int getUserId() { return userId; }
+
+    public int getPostId() { return postId; }
+
+    public Date getSavedAt() { return savedAt; }
 }
