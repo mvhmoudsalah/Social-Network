@@ -3,8 +3,8 @@ package social_network;
 import java.util.Date;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.PreparedStatement;// OOP TO DB
+import java.sql.ResultSet;  //DB TO OOP
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Statement;
@@ -64,7 +64,7 @@ public class User {
                     "MySQL Connector/J is not installed.", e
             );
         }
-
+// WWW.FACEBOOK.COM/
         String url = "jdbc:mysql://" + host + ":" + port
                 + "/" + database
                 + "?sslMode=REQUIRED&serverTimezone=UTC";
@@ -268,7 +268,7 @@ public class User {
     }
 
     // Map Database Result To User Object
-    private static User mapUser(ResultSet rs)
+    private static User mapUser(ResultSet rs) 
             throws SQLException {
 
         User user = new User(
