@@ -1,7 +1,6 @@
 package social_network.model.content;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import social_network.database.ConnectDB;
 import social_network.model.enums.PostVisibility;
 
 public class Post {
@@ -87,7 +87,7 @@ public class Post {
         if (content == null || content.isBlank()) {
             throw new IllegalArgumentException("Post content cannot be empty.");
         }
-        try (Connection c = getConnection()) {
+        try (Connection c = ConnectDB.getConnection()) {
             c.setAutoCommit(false);
             try {
                 int newId;
@@ -117,7 +117,7 @@ public class Post {
 
     /** Returns the post, or null if it does not exist. No visibility check. */
     public static Post findById(int id) throws SQLException {
-        try (Connection c = getConnection()) {
+        try (Connection c = ConnectDB.getConnection()) {
             return findById(c, id);
         }
     }
@@ -126,7 +126,7 @@ public class Post {
     public static List<Post> findByUser(int authorId, int viewerId) throws SQLException {
         String sql = SELECT_POST + "WHERE p.user_id = ? AND " + VISIBLE_TO_VIEWER
                 + " ORDER BY p.created_at DESC";
-        try (Connection c = getConnection();
+        try (Connection c = ConnectDB.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, authorId);
             ps.setInt(2, viewerId);
@@ -144,7 +144,7 @@ public class Post {
                 + "JOIN hashtags h ON h.id = ph.hashtag_id "
                 + "WHERE h.tag = ? AND " + VISIBLE_TO_VIEWER
                 + " ORDER BY p.created_at DESC";
-        try (Connection c = getConnection();
+        try (Connection c = ConnectDB.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, clean.toLowerCase());
             ps.setInt(2, viewerId);
@@ -156,7 +156,7 @@ public class Post {
 
     /** Deletes the post. Comments, likes, etc. go with it (ON DELETE CASCADE). */
     public static boolean delete(int postId) throws SQLException {
-        try (Connection c = getConnection();
+        try (Connection c = ConnectDB.getConnection();
              PreparedStatement ps = c.prepareStatement("DELETE FROM posts WHERE id = ?")) {
             ps.setInt(1, postId);
             return ps.executeUpdate() > 0;
@@ -168,7 +168,7 @@ public class Post {
         if (a == b) {
             return false;
         }
-        try (Connection c = getConnection();
+        try (Connection c = ConnectDB.getConnection();
              PreparedStatement ps = c.prepareStatement(
                      "SELECT 1 FROM friendships WHERE user_a = ? AND user_b = ?")) {
             ps.setInt(1, Math.min(a, b));
@@ -193,32 +193,11 @@ public class Post {
             "SELECT p.id, p.user_id, p.content, p.visibility, p.created_at, p.updated_at "
             + "FROM posts p ";
 
-    private static Connection getConnection() throws SQLException {
-        String host = System.getenv("DB_HOST");
-        String port = System.getenv("DB_PORT");
-        String database = System.getenv("DB_NAME");
-        String dbUsername = System.getenv("DB_USER");
-        String password = System.getenv("DB_PASSWORD");
-
-        if (host == null || port == null || database == null
-                || dbUsername == null || password == null) {
-            throw new SQLException("Database environment variables are missing.");
-        }
-
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new SQLException("MySQL Connector/J is not installed.", e);
-        }
-
-        String url = "jdbc:mysql://" + host + ":" + port + "/" + database
-                + "?sslMode=REQUIRED&serverTimezone=UTC";
-        return DriverManager.getConnection(url, dbUsername, password);
-    }
+    
 
     /** Saves content, visibility and updated_at, and rebuilds the hashtag links. */
     private void save() throws SQLException {
-        try (Connection c = getConnection()) {
+        try (Connection c = ConnectDB.getConnection()) {
             c.setAutoCommit(false);
             try {
                 int rows;
@@ -277,7 +256,7 @@ public class Post {
     }
 
     private static int count(String sql, int id) throws SQLException {
-        try (Connection c = getConnection();
+        try (Connection c = ConnectDB.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {

@@ -1,4 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
-    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="1">
+        <file>
+            <url>src/social_network/Post.java</url>
+            <bookmark id="1">
+                <name/>
+                <line>291</line>
+                <key/>
+            </bookmark>
+        </file>
+    </editor-bookmarks>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/F:/Social_network/Social_Network/src/social_network/service/GroupService.java</file>
+            <file>file:/F:/Social_network/Social_Network/src/social_network/service/MessagingService.java</file>
+            <file>file:/F:/Social_network/Social_Network/src/social_network/service/ModerationService.java</file>
+            <file>file:/F:/Social_network/Social_Network/src/social_network/service/SocialNetworkService.java</file>
+            <file>file:/F:/Social_network/Social_Network/src/social_network/model/user/UserSettings.java</file>
+            <file>file:/F:/Social_network/Social_Network/src/social_network/model/user/User.java</file>
+            <file>file:/F:/Social_network/Social_Network/src/social_network/model/system/Notification.java</file>
+            <file>file:/F:/Social_network/Social_Network/src/social_network/model/system/Report.java</file>
+        </group>
+    </open-files>
 </project-private>

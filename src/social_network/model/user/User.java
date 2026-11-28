@@ -2,7 +2,6 @@ package social_network.model.user;
 
 import java.util.Date;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,6 +9,7 @@ import java.sql.Timestamp;
 import java.sql.Statement;
 
 import org.mindrot.jbcrypt.BCrypt;
+import social_network.database.ConnectDB;
 
 public class User {
 
@@ -39,41 +39,7 @@ public class User {
         this.updatedAt = new Date();
     }
 
-    // Database Connection
-    private static Connection getConnection()
-            throws SQLException {
-
-        String host = System.getenv("DB_HOST");
-        String port = System.getenv("DB_PORT");
-        String database = System.getenv("DB_NAME");
-        String dbUsername = System.getenv("DB_USER");
-        String password = System.getenv("DB_PASSWORD");
-
-        if (host == null || port == null || database == null
-                || dbUsername == null || password == null) {
-
-            throw new SQLException(
-                    "Database environment variables are missing."
-            );
-        }
-
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new SQLException(
-                    "MySQL Connector/J is not installed.", e
-            );
-        }
-
-        String url = "jdbc:mysql://" + host + ":" + port
-                + "/" + database
-                + "?sslMode=REQUIRED&serverTimezone=UTC";
-
-        return DriverManager.getConnection(
-                url, dbUsername, password
-        );
-    }
-
+    
     // Register User
     public static User register(String username,
                                 String email,
@@ -99,7 +65,7 @@ public class User {
                 + "(username, email, password_hash) "
                 + "VALUES (?, ?, ?)";
 
-        try (Connection con = getConnection();
+        try (Connection con = ConnectDB.getConnection();
              PreparedStatement ps = con.prepareStatement(
                      sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -135,7 +101,7 @@ public class User {
 
         String sql = "SELECT * FROM users WHERE email = ?";
 
-        try (Connection con = getConnection();
+        try (Connection con = ConnectDB.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, email);
@@ -182,7 +148,7 @@ public class User {
                 + "updated_at = CURRENT_TIMESTAMP "
                 + "WHERE id = ?";
 
-        try (Connection con = getConnection();
+        try (Connection con = ConnectDB.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, username);
@@ -207,7 +173,7 @@ public class User {
                 + "updated_at = CURRENT_TIMESTAMP "
                 + "WHERE id = ?";
 
-        try (Connection con = getConnection();
+        try (Connection con = ConnectDB.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, id);
@@ -230,7 +196,7 @@ public class User {
                 + "updated_at = CURRENT_TIMESTAMP "
                 + "WHERE id = ?";
 
-        try (Connection con = getConnection();
+        try (Connection con = ConnectDB.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, id);
@@ -251,7 +217,7 @@ public class User {
 
         String sql = "SELECT * FROM users WHERE id = ?";
 
-        try (Connection con = getConnection();
+        try (Connection con = ConnectDB.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, userId);
@@ -365,88 +331,4 @@ public class User {
     public Date getUpdatedAt() {
         return updatedAt;
     }
-
-    // ------------------------------------------------------------
-    // Debug / Test
-    // ------------------------------------------------------------
-    public static void main(String[] args) {
-
-        String email = "mohamed@gmail.com";
-        String password = "12345678";
-
-        try {
-
-            // Step 1: show which database we are connected to
-            // and every user stored in it
-            try (Connection con = getConnection();
-                 Statement st = con.createStatement();
-                 ResultSet r = st.executeQuery(
-                         "SELECT DATABASE() AS db, id, email, is_active "
-                         + "FROM users")) {
-
-                System.out.println("=== USERS IN DATABASE ===");
-
-                boolean any = false;
-
-                while (r.next()) {
-                    any = true;
-                    System.out.println(r.getString("db")
-                            + " | id=" + r.getInt("id")
-                            + " | [" + r.getString("email") + "]"
-                            + " | active=" + r.getBoolean("is_active"));
-                }
-
-                if (!any) {
-                    System.out.println("(table is empty)");
-                }
-            }
-
-            // Step 2: check whether our test user exists
-            boolean exists;
-
-            try (Connection con = getConnection();
-                 PreparedStatement ps = con.prepareStatement(
-                         "SELECT 1 FROM users WHERE email = ?")) {
-
-                ps.setString(1, email);
-
-                try (ResultSet rs = ps.executeQuery()) {
-                    exists = rs.next();
-                }
-            }
-
-            // Step 3: register it if missing
-            if (!exists) {
-
-                System.out.println("\nUser not found -> registering...");
-
-                User u = register("mohamed", email, password);
-
-                System.out.println(u != null
-                        ? "Registered, id=" + u.getId()
-                        : "Register FAILED!");
-            } else {
-                System.out.println("\nUser already exists.");
-            }
-
-            // Step 4: test the real login() method
-            System.out.println("\n=== LOGIN TEST ===");
-
-            User logged = login(email, password);
-
-            if (logged != null) {
-                System.out.println("LOGIN WORKS! Welcome "
-                        + logged.getUsername()
-                        + " (id=" + logged.getId() + ")");
-            } else {
-                System.out.println("LOGIN FAILED! "
-                        + "(wrong password, inactive account, "
-                        + "or invalid hash)");
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
 }
